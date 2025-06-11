@@ -19,10 +19,6 @@ st.markdown("""
         padding: 1em 0.5em;
     }
 
-    .css-1cpxqw2 { background-color: #1e3c72 !important; }
-    .css-14r9z6v { background-color: #2980b9 !important; }
-    .css-1cpxqw2:hover { background-color: #3a6073 !important; }
-
     h1, h2, h3, h4 {
         color: #ffffff;
         font-weight: bold;
@@ -80,7 +76,7 @@ if uploaded_file is not None:
         st.audio(buf, format='audio/wav')
         st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
-        # --- Overall waveform comparison ---
+        # --- Waveform comparison ---
         st.subheader("📊 Original vs Processed Waveform")
         fig, axs = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
 
@@ -101,33 +97,3 @@ if uploaded_file is not None:
 
         fig.patch.set_facecolor("#0B1F3A")
         st.pyplot(fig)
-
-        # --- Band-by-band Before/After Comparison ---
-        st.subheader("🎛️ Frequency Band Comparison")
-
-        bands = [("Bass", 60, 250, bass), ("Midrange", 250, 4000, mid), ("Treble", 4000, 10000, treble)]
-
-        for name, low, high, gain in bands:
-            # Filter original and processed
-            original_band = bandpass_filter(data, low, high, fs)
-            processed_band = original_band * gain
-
-            time_band = np.linspace(0, len(original_band) / fs, num=len(original_band))
-
-            fig, axs = plt.subplots(2, 1, figsize=(10, 4), sharex=True)
-
-            axs[0].plot(time_band, original_band, color='lightgray', linewidth=0.5)
-            axs[0].set_title(f"{name} Band - Original", fontsize=11, color='white')
-            axs[0].set_ylabel("Amplitude", color='white')
-            axs[0].set_facecolor("#0B1F3A")
-            axs[0].tick_params(colors='white')
-
-            axs[1].plot(time_band, processed_band, color='cyan', linewidth=0.5)
-            axs[1].set_title(f"{name} Band - After Gain x{gain}", fontsize=11, color='white')
-            axs[1].set_xlabel("Time [s]", color='white')
-            axs[1].set_ylabel("Amplitude", color='white')
-            axs[1].set_facecolor("#0B1F3A")
-            axs[1].tick_params(colors='white')
-
-            fig.patch.set_facecolor("#0B1F3A")
-            st.pyplot(fig)
