@@ -60,8 +60,7 @@ if uploaded_file is not None:
         st.error("⚠️ File size exceeds 100 MB limit. Please upload a smaller file.")
     else:
         data, fs = load_audio(uploaded_file)
-        st.audio(uploaded_file)
-
+        
         st.subheader("🎚️ Adjust Frequency Bands")
         bass = st.slider("Bass (60–250 Hz)", 0.0, 2.0, 1.0, 0.1)
         mid = st.slider("Midrange (250 Hz – 4 kHz)", 0.0, 2.0, 1.0, 0.1)
@@ -73,27 +72,21 @@ if uploaded_file is not None:
         # Save and playback
         buf = io.BytesIO()
         sf.write(buf, output, fs, format='WAV')
+        st.subheader("🔊 Processed Audio Playback")
         st.audio(buf, format='audio/wav')
         st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
-        # --- Waveform comparison ---
-        st.subheader("📊 Original vs Processed Waveform")
-        fig, axs = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+        # --- Show processed waveform only ---
+        st.subheader("📊 Processed Audio Waveform")
+        fig, ax = plt.subplots(figsize=(10, 4))
+        time = np.linspace(0, len(output) / fs, num=len(output))
 
-        time = np.linspace(0, len(data) / fs, num=len(data))
-
-        axs[0].plot(time, data, color="lightgray", linewidth=0.5)
-        axs[0].set_title("Original Audio", fontsize=12, fontweight='bold', color='white')
-        axs[0].set_ylabel("Amplitude", fontsize=10, color='white')
-        axs[0].set_facecolor("#0B1F3A")
-        axs[0].tick_params(colors='white')
-
-        axs[1].plot(time, output, color="cyan", linewidth=0.5)
-        axs[1].set_title("Processed Audio", fontsize=12, fontweight='bold', color='white')
-        axs[1].set_xlabel("Time [s]", fontsize=10, color='white')
-        axs[1].set_ylabel("Amplitude", fontsize=10, color='white')
-        axs[1].set_facecolor("#0B1F3A")
-        axs[1].tick_params(colors='white')
-
+        ax.plot(time, output, color="cyan", linewidth=0.5)
+        ax.set_title("Processed Audio", fontsize=12, fontweight='bold', color='white')
+        ax.set_xlabel("Time [s]", fontsize=10, color='white')
+        ax.set_ylabel("Amplitude", fontsize=10, color='white')
+        ax.set_facecolor("#0B1F3A")
+        ax.tick_params(colors='white')
         fig.patch.set_facecolor("#0B1F3A")
+
         st.pyplot(fig)
