@@ -6,6 +6,34 @@ import io
 import librosa
 import matplotlib.pyplot as plt
 
+# --- Custom CSS for Dark Blue Theme ---
+st.markdown("""
+    <style>
+        body {
+            background-color: #0B1F3A;
+            color: white;
+        }
+        .stApp {
+            background-color: #0B1F3A;
+        }
+        .css-1cpxqw2 {  /* Slider track */
+            background-color: #1F3B73 !important;
+        }
+        .css-14r9z6v {  /* Slider handle */
+            background-color: #3A74C9 !important;
+        }
+        .css-1cpxqw2 .css-1cpxqw2:focus { 
+            background-color: #3A74C9 !important;
+        }
+        .css-1cpxqw2:hover {
+            background-color: #265DAB !important;
+        }
+        .stSlider > div {
+            padding: 1em 0.5em;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # --- Audio loading function ---
 def load_audio(file):
     y, sr = librosa.load(file, sr=None, mono=True)
@@ -38,7 +66,7 @@ if uploaded_file is not None:
         data, fs = load_audio(uploaded_file)
         st.audio(uploaded_file)
 
-        st.subheader("Adjust Frequency Bands")
+        st.subheader("🎚️ Adjust Frequency Bands")
         bass = st.slider("Bass (60–250 Hz)", 0.0, 2.0, 1.0, 0.1)
         mid = st.slider("Midrange (250 Hz – 4 kHz)", 0.0, 2.0, 1.0, 0.1)
         treble = st.slider("Treble (4–10 kHz)", 0.0, 2.0, 1.0, 0.1)
@@ -49,17 +77,17 @@ if uploaded_file is not None:
         buf = io.BytesIO()
         sf.write(buf, output, fs, format='WAV')
         st.audio(buf, format='audio/wav')
-        st.download_button("Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
+        st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
         # --- Visualization with matplotlib ---
-        st.subheader("Waveform Visualization")
+        st.subheader("📊 Waveform Visualization")
         fig, ax = plt.subplots(figsize=(10, 3))
         time = np.linspace(0, len(output) / fs, num=len(output))
-        ax.plot(time, output, color="black", linewidth=0.5)
-        ax.set_facecolor("white")
-        fig.patch.set_facecolor("white")
-        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='black')
-        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='black')
-        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='black')
-        ax.tick_params(colors='black')
+        ax.plot(time, output, color="white", linewidth=0.5)
+        ax.set_facecolor("#0B1F3A")
+        fig.patch.set_facecolor("#0B1F3A")
+        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='white')
+        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='white')
+        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='white')
+        ax.tick_params(colors='white')
         st.pyplot(fig)
