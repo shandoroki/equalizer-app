@@ -22,6 +22,9 @@ st.markdown("""
         .css-14r9z6v {  /* Slider handle */
             background-color: #3A74C9 !important;
         }
+        .css-1cpxqw2 .css-1cpxqw2:focus { 
+            background-color: #3A74C9 !important;
+        }
         .css-1cpxqw2:hover {
             background-color: #265DAB !important;
         }
@@ -77,25 +80,14 @@ if uploaded_file is not None:
         st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
         # --- Visualization with matplotlib ---
-        st.subheader("📊 Original vs Processed Waveform")
-        fig, axs = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
-
-        time = np.linspace(0, len(data) / fs, num=len(data))
-
-        # Original waveform
-        axs[0].plot(time, data, color="gray", linewidth=0.5)
-        axs[0].set_title("Original Audio", fontsize=12, fontweight='bold', color='white')
-        axs[0].set_ylabel("Amplitude", fontsize=10, color='white')
-        axs[0].set_facecolor("#0B1F3A")
-        axs[0].tick_params(colors='white')
-
-        # Processed waveform
-        axs[1].plot(time, output, color="white", linewidth=0.5)
-        axs[1].set_title("Processed Audio", fontsize=12, fontweight='bold', color='white')
-        axs[1].set_xlabel("Time [s]", fontsize=10, color='white')
-        axs[1].set_ylabel("Amplitude", fontsize=10, color='white')
-        axs[1].set_facecolor("#0B1F3A")
-        axs[1].tick_params(colors='white')
-
+        st.subheader("📊 Waveform Visualization")
+        fig, ax = plt.subplots(figsize=(10, 3))
+        time = np.linspace(0, len(output) / fs, num=len(output))
+        ax.plot(time, output, color="white", linewidth=0.5)
+        ax.set_facecolor("#0B1F3A")
         fig.patch.set_facecolor("#0B1F3A")
+        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='white')
+        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='white')
+        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='white')
+        ax.tick_params(colors='white')
         st.pyplot(fig)
