@@ -5,7 +5,42 @@ from scipy.signal import firwin, lfilter
 import io
 import librosa
 import matplotlib.pyplot as plt
-import streamlit.components.v1 as components
+import streamlit.components.v1 as components# --- Custom CSS for vertical sliders and dark theme ---
+st.markdown("""
+    <style>
+    body {
+        background-color: #0b1a2d;
+        color: white;
+    }
+    .block-container {
+        background-color: #0b1a2d;
+    }
+    .slider-container {
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        padding: 20px;
+    }
+    .slider {
+        -webkit-appearance: slider-vertical;
+        writing-mode: bt-lr; /* bottom to top */
+        width: 8px;
+        height: 200px;
+        background: #0b1a2d;
+        accent-color: #00ffcc;
+    }
+    .slider-label {
+        text-align: center;
+        margin-top: 10px;
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# st.set_page_config(layout="wide")  <-- ✅ This line is now removed
+
+st.markdown("<h1 style='text-align: center;'>🎛️ Digital Music Equalizer</h1>", unsafe_allow_html=True)
+
 
 # --- Custom CSS for vertical sliders and dark theme ---
 st.markdown("""
