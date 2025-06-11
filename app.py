@@ -6,31 +6,24 @@ import io
 import librosa
 import matplotlib.pyplot as plt
 
-# --- Custom CSS for dark blue theme and slider styling ---
+# --- Custom CSS for dark blue theme and cyan sliders ---
 st.markdown("""
     <style>
-    body {
-        background-color: #0a1e3c;
-        color: white;
-    }
     .stApp {
         background-color: #0a1e3c;
         color: white;
     }
-    .stSlider > div {
-        padding-top: 20px;
-        padding-bottom: 20px;
-    }
-    input[type="range"] {
+    /* Thicker, cyan sliders */
+    input[type=range] {
+        accent-color: #00ffff;
         height: 8px;
-        background: #00ffff;
     }
-    .css-1cpxqw2 {
+    .css-1cpxqw2, .stSlider > div {
         background-color: #00ffff !important;
         height: 8px !important;
         border-radius: 10px !important;
     }
-    .css-14pt78w {
+    .css-14pt78w, .css-1cpgz07 {
         color: white !important;
     }
     </style>
@@ -79,17 +72,4 @@ if uploaded_file is not None:
         buf = io.BytesIO()
         sf.write(buf, output, fs, format='WAV')
         st.audio(buf, format='audio/wav')
-        st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
-
-        # --- Visualization with matplotlib ---
-        st.subheader("📈 Processed Audio Waveform")
-        fig, ax = plt.subplots(figsize=(10, 3))
-        time = np.linspace(0, len(output) / fs, num=len(output))
-        ax.plot(time, output, color="#00ffff", linewidth=0.8)
-        ax.set_facecolor("#0a1e3c")
-        fig.patch.set_facecolor("#0a1e3c")
-        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='white')
-        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='white')
-        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='white')
-        ax.tick_params(colors='white')
-        st.pyplot(fig)
+        st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_n
