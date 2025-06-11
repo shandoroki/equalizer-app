@@ -84,7 +84,7 @@ def apply_equalizer(data, fs, gains):
     return processed
 
 # --- UI ---
-st.title("🎛️ DJ Equalizer: Hot Pink Glow Edition")
+st.title("🎛️ Digital Music Equalizer")
 
 uploaded_file = st.file_uploader("🎵 Upload your audio track (WAV or MP3)", type=["wav", "mp3"])
 
