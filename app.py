@@ -1,4 +1,3 @@
-# project
 import streamlit as st
 import numpy as np
 import soundfile as sf
@@ -27,9 +26,10 @@ def apply_equalizer(data, fs, gains):
     return processed
 
 # --- Streamlit UI ---
-st.title("🎙️ Digital Music Equalizer")
+st.set_page_config(layout="wide")
+st.title("🎛️ Digital Music Equalizer")
 
-uploaded_file = st.file_uploader("Upload audio file (WAV or MP3)", type=["wav", "mp3"])
+uploaded_file = st.file_uploader("🎵 Upload audio file (WAV or MP3)", type=["wav", "mp3"])
 
 if uploaded_file is not None:
     file_size_mb = uploaded_file.size / (1024 * 1024)
@@ -39,10 +39,22 @@ if uploaded_file is not None:
         data, fs = load_audio(uploaded_file)
         st.audio(uploaded_file)
 
-        st.subheader("Adjust Frequency Bands")
-        bass = st.slider("Bass (60–250 Hz)", 0.0, 2.0, 1.0, 0.1)
-        mid = st.slider("Midrange (250 Hz – 4 kHz)", 0.0, 2.0, 1.0, 0.1)
-        treble = st.slider("Treble (4–10 kHz)", 0.0, 2.0, 1.0, 0.1)
+        st.subheader("🎚️ Equalizer Settings")
+
+        # Create 3 columns for vertical sliders
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.markdown("**🎧 Bass (60–250 Hz)**", unsafe_allow_html=True)
+            bass = st.slider("", 0.0, 2.0, 1.0, 0.1, key="bass")
+
+        with col2:
+            st.markdown("**🎤 Midrange (250–4000 Hz)**", unsafe_allow_html=True)
+            mid = st.slider("", 0.0, 2.0, 1.0, 0.1, key="mid")
+
+        with col3:
+            st.markdown("**🎻 Treble (4–10 kHz)**", unsafe_allow_html=True)
+            treble = st.slider("", 0.0, 2.0, 1.0, 0.1, key="treble")
 
         output = apply_equalizer(data, fs, [bass, mid, treble])
 
@@ -50,10 +62,10 @@ if uploaded_file is not None:
         buf = io.BytesIO()
         sf.write(buf, output, fs, format='WAV')
         st.audio(buf, format='audio/wav')
-        st.download_button("Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
+        st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
         # --- Visualization with matplotlib ---
-        st.subheader("Waveform Visualization")
+        st.subheader("📈 Waveform Visualization")
         fig, ax = plt.subplots(figsize=(10, 3))
         time = np.linspace(0, len(output) / fs, num=len(output))
         ax.plot(time, output, color="black", linewidth=0.5)
