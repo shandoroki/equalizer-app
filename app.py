@@ -6,31 +6,34 @@ import io
 import librosa
 import matplotlib.pyplot as plt
 
-# --- Custom CSS for Dark Blue Theme ---
+# --- Cool Gradient Background and Slider Styling ---
 st.markdown("""
     <style>
-        body {
-            background-color: #0B1F3A;
-            color: white;
-        }
-        .stApp {
-            background-color: #0B1F3A;
-        }
-        .css-1cpxqw2 {  /* Slider track */
-            background-color: #1F3B73 !important;
-        }
-        .css-14r9z6v {  /* Slider handle */
-            background-color: #3A74C9 !important;
-        }
-        .css-1cpxqw2 .css-1cpxqw2:focus { 
-            background-color: #3A74C9 !important;
-        }
-        .css-1cpxqw2:hover {
-            background-color: #265DAB !important;
-        }
-        .stSlider > div {
-            padding: 1em 0.5em;
-        }
+    /* Gradient background */
+    .stApp {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Slider tweaks */
+    .stSlider > div {
+        padding: 1em 0.5em;
+    }
+    .css-1cpxqw2 { background-color: #1e3c72 !important; }
+    .css-14r9z6v { background-color: #2980b9 !important; }
+    .css-1cpxqw2:hover { background-color: #3a6073 !important; }
+
+    /* Header styling */
+    h1, h2, h3, h4 {
+        color: #ffffff;
+        font-weight: bold;
+    }
+
+    /* Customize audio element */
+    audio {
+        filter: drop-shadow(2px 2px 4px #000000aa);
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -54,7 +57,7 @@ def apply_equalizer(data, fs, gains):
     return processed
 
 # --- Streamlit UI ---
-st.title("🎙️ Digital Music Equalizer")
+st.title("🎧 Digital Music Equalizer")
 
 uploaded_file = st.file_uploader("Upload audio file (WAV or MP3)", type=["wav", "mp3"])
 
@@ -79,15 +82,24 @@ if uploaded_file is not None:
         st.audio(buf, format='audio/wav')
         st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
-        # --- Visualization with matplotlib ---
-        st.subheader("📊 Waveform Visualization")
-        fig, ax = plt.subplots(figsize=(10, 3))
-        time = np.linspace(0, len(output) / fs, num=len(output))
-        ax.plot(time, output, color="white", linewidth=0.5)
-        ax.set_facecolor("#0B1F3A")
+        # --- Visualization: Original vs Processed ---
+        st.subheader("📊 Original vs Processed Waveform")
+        fig, axs = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+        time = np.linspace(0, len(data) / fs, num=len(data))
+
+        axs[0].plot(time, data, color="lightgray", linewidth=0.5)
+        axs[0].set_title("Original Audio", fontsize=12, fontweight='bold', color='white')
+        axs[0].set_ylabel("Amplitude", fontsize=10, color='white')
+        axs[0].set_facecolor("#0B1F3A")
+        axs[0].tick_params(colors='white')
+
+        axs[1].plot(time, output, color="cyan", linewidth=0.5)
+        axs[1].set_title("Processed Audio", fontsize=12, fontweight='bold', color='white')
+        axs[1].set_xlabel("Time [s]", fontsize=10, color='white')
+        axs[1].set_ylabel("Amplitude", fontsize=10, color='white')
+        axs[1].set_facecolor("#0B1F3A")
+        axs[1].tick_params(colors='white')
+
         fig.patch.set_facecolor("#0B1F3A")
-        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='white')
-        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='white')
-        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='white')
-        ax.tick_params(colors='white')
         st.pyplot(fig)
