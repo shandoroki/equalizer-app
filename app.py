@@ -6,32 +6,6 @@ import io
 import librosa
 import matplotlib.pyplot as plt
 
-# --- Apply custom styles ---
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #001f3f;
-        color: white;
-    }
-    .stSlider > div[data-baseweb="slider"] > div {
-        background: #00ffff !important;
-        height: 8px;
-    }
-    .stSlider > label {
-        color: #00ffff;
-        font-weight: bold;
-    }
-    .stDownloadButton > button {
-        background-color: #0074D9;
-        color: white;
-        font-weight: bold;
-    }
-    h1, h2, h3, .st-bb, .st-c2 {
-        color: #00ffff;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
 # --- Audio loading function ---
 def load_audio(file):
     y, sr = librosa.load(file, sr=None, mono=True)
@@ -54,7 +28,7 @@ def apply_equalizer(data, fs, gains):
 # --- Streamlit UI ---
 st.title("🎙️ Digital Music Equalizer")
 
-uploaded_file = st.file_uploader("🎵 Upload audio file (WAV or MP3)", type=["wav", "mp3"])
+uploaded_file = st.file_uploader("Upload audio file (WAV or MP3)", type=["wav", "mp3"])
 
 if uploaded_file is not None:
     file_size_mb = uploaded_file.size / (1024 * 1024)
@@ -64,7 +38,7 @@ if uploaded_file is not None:
         data, fs = load_audio(uploaded_file)
         st.audio(uploaded_file)
 
-        st.subheader("🎚️ Adjust Frequency Bands")
+        st.subheader("Adjust Frequency Bands")
         bass = st.slider("Bass (60–250 Hz)", 0.0, 2.0, 1.0, 0.1)
         mid = st.slider("Midrange (250 Hz – 4 kHz)", 0.0, 2.0, 1.0, 0.1)
         treble = st.slider("Treble (4–10 kHz)", 0.0, 2.0, 1.0, 0.1)
@@ -75,17 +49,17 @@ if uploaded_file is not None:
         buf = io.BytesIO()
         sf.write(buf, output, fs, format='WAV')
         st.audio(buf, format='audio/wav')
-        st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
+        st.download_button("Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
         # --- Visualization with matplotlib ---
-        st.subheader("📈 Waveform Visualization")
+        st.subheader("Waveform Visualization")
         fig, ax = plt.subplots(figsize=(10, 3))
         time = np.linspace(0, len(output) / fs, num=len(output))
-        ax.plot(time, output, color="#00ffff", linewidth=0.8)
-        ax.set_facecolor("black")
-        fig.patch.set_facecolor("black")
-        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='white')
-        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='white')
-        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='white')
-        ax.tick_params(colors='white')
+        ax.plot(time, output, color="black", linewidth=0.5)
+        ax.set_facecolor("white")
+        fig.patch.set_facecolor("white")
+        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='black')
+        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='black')
+        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='black')
+        ax.tick_params(colors='black')
         st.pyplot(fig)
