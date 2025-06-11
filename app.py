@@ -6,32 +6,28 @@ import io
 import librosa
 import matplotlib.pyplot as plt
 
-# --- Custom CSS for dark blue theme and slider styling ---
+# --- Apply custom styles ---
 st.markdown("""
     <style>
-    body {
-        background-color: #0a1e3c;
-        color: white;
-    }
     .stApp {
-        background-color: #0a1e3c;
+        background-color: #001f3f;
         color: white;
     }
-    .stSlider > div {
-        padding-top: 20px;
-        padding-bottom: 20px;
-    }
-    input[type="range"] {
+    .stSlider > div[data-baseweb="slider"] > div {
+        background: #00ffff !important;
         height: 8px;
-        background: #00ffff;
     }
-    .css-1cpxqw2 {
-        background-color: #00ffff !important;
-        height: 8px !important;
-        border-radius: 10px !important;
+    .stSlider > label {
+        color: #00ffff;
+        font-weight: bold;
     }
-    .css-14pt78w {
-        color: white !important;
+    .stDownloadButton > button {
+        background-color: #0074D9;
+        color: white;
+        font-weight: bold;
+    }
+    h1, h2, h3, .st-bb, .st-c2 {
+        color: #00ffff;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -82,12 +78,12 @@ if uploaded_file is not None:
         st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
         # --- Visualization with matplotlib ---
-        st.subheader("📈 Processed Audio Waveform")
+        st.subheader("📈 Waveform Visualization")
         fig, ax = plt.subplots(figsize=(10, 3))
         time = np.linspace(0, len(output) / fs, num=len(output))
         ax.plot(time, output, color="#00ffff", linewidth=0.8)
-        ax.set_facecolor("#0a1e3c")
-        fig.patch.set_facecolor("#0a1e3c")
+        ax.set_facecolor("black")
+        fig.patch.set_facecolor("black")
         ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='white')
         ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='white')
         ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='white')
