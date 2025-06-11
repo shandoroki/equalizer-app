@@ -125,4 +125,8 @@ if uploaded_file is not None:
         axs[1].set_title("Processed Track", fontsize=12, color='#ff69b4')
         axs[1].set_xlabel("Time [s]", color='white')
         axs[1].set_ylabel("Amplitude", color='white')
-        axs[1].set_facecolor("#0_
+        axs[1].set_facecolor("#000000")
+        axs[1].tick_params(colors='white')
+
+        fig.patch.set_facecolor("#000000")
+        st.pyplot(fig)
