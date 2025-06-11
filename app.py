@@ -5,18 +5,54 @@ from scipy.signal import firwin, lfilter
 import io
 import librosa
 import matplotlib.pyplot as plt
+import streamlit.components.v1 as components
 
-# --- Audio loading function ---
+# --- Custom CSS for vertical sliders and dark theme ---
+st.markdown("""
+    <style>
+    body {
+        background-color: #0b1a2d;
+        color: white;
+    }
+    .block-container {
+        background-color: #0b1a2d;
+    }
+    .slider-container {
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        padding: 20px;
+    }
+    .slider {
+        -webkit-appearance: slider-vertical;
+        writing-mode: bt-lr; /* bottom to top */
+        width: 8px;
+        height: 200px;
+        background: #0b1a2d;
+        accent-color: #00ffcc;
+    }
+    .slider-label {
+        text-align: center;
+        margin-top: 10px;
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.set_page_config(layout="wide")
+st.markdown("<h1 style='text-align: center;'>🎛️ Digital Music Equalizer</h1>", unsafe_allow_html=True)
+
+# --- Upload audio ---
+uploaded_file = st.file_uploader("🎵 Upload audio file (WAV or MP3)", type=["wav", "mp3"])
+
 def load_audio(file):
     y, sr = librosa.load(file, sr=None, mono=True)
     return y, sr
 
-# --- Bandpass filter function ---
 def bandpass_filter(data, lowcut, highcut, fs, numtaps=101):
     taps = firwin(numtaps, [lowcut, highcut], pass_zero=False, fs=fs)
     return lfilter(taps, 1.0, data)
 
-# --- Apply equalizer with adjustable gains ---
 def apply_equalizer(data, fs, gains):
     bands = [(60, 250), (250, 4000), (4000, 10000)]  # Bass, Mid, Treble
     processed = np.zeros_like(data)
@@ -25,54 +61,50 @@ def apply_equalizer(data, fs, gains):
         processed += filtered * gain
     return processed
 
-# --- Streamlit UI ---
-st.set_page_config(layout="wide")
-st.title("🎛️ Digital Music Equalizer")
+if uploaded_file:
+    data, fs = load_audio(uploaded_file)
+    st.audio(uploaded_file)
 
-uploaded_file = st.file_uploader("🎵 Upload audio file (WAV or MP3)", type=["wav", "mp3"])
+    st.markdown("### 🎚️ Equalizer Controls (Vertical Sliders)")
 
-if uploaded_file is not None:
-    file_size_mb = uploaded_file.size / (1024 * 1024)
-    if file_size_mb > 100:
-        st.error("⚠️ File size exceeds 100 MB limit. Please upload a smaller file.")
-    else:
-        data, fs = load_audio(uploaded_file)
-        st.audio(uploaded_file)
+    # Create vertical sliders using raw HTML
+    bass_gain = st.slider("Bass (60–250 Hz)", 0.0, 2.0, 1.0, 0.1, key="bass")
+    mid_gain = st.slider("Midrange (250–4k Hz)", 0.0, 2.0, 1.0, 0.1, key="mid")
+    treble_gain = st.slider("Treble (4–10k Hz)", 0.0, 2.0, 1.0, 0.1, key="treble")
 
-        st.subheader("🎚️ Equalizer Settings")
+    # Simulated vertical sliders
+    components.html(f"""
+        <div class="slider-container">
+            <div>
+                <input type="range" min="0" max="2" value="{bass_gain}" step="0.1" class="slider" disabled>
+                <div class="slider-label">Bass</div>
+            </div>
+            <div>
+                <input type="range" min="0" max="2" value="{mid_gain}" step="0.1" class="slider" disabled>
+                <div class="slider-label">Mid</div>
+            </div>
+            <div>
+                <input type="range" min="0" max="2" value="{treble_gain}" step="0.1" class="slider" disabled>
+                <div class="slider-label">Treble</div>
+            </div>
+        </div>
+    """, height=300)
 
-        # Create 3 columns for vertical sliders
-        col1, col2, col3 = st.columns(3)
+    output = apply_equalizer(data, fs, [bass_gain, mid_gain, treble_gain])
 
-        with col1:
-            st.markdown("**🎧 Bass (60–250 Hz)**", unsafe_allow_html=True)
-            bass = st.slider("", 0.0, 2.0, 1.0, 0.1, key="bass")
+    buf = io.BytesIO()
+    sf.write(buf, output, fs, format='WAV')
+    st.audio(buf, format='audio/wav')
+    st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
 
-        with col2:
-            st.markdown("**🎤 Midrange (250–4000 Hz)**", unsafe_allow_html=True)
-            mid = st.slider("", 0.0, 2.0, 1.0, 0.1, key="mid")
-
-        with col3:
-            st.markdown("**🎻 Treble (4–10 kHz)**", unsafe_allow_html=True)
-            treble = st.slider("", 0.0, 2.0, 1.0, 0.1, key="treble")
-
-        output = apply_equalizer(data, fs, [bass, mid, treble])
-
-        # Save to buffer and playback
-        buf = io.BytesIO()
-        sf.write(buf, output, fs, format='WAV')
-        st.audio(buf, format='audio/wav')
-        st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="equalized_output.wav")
-
-        # --- Visualization with matplotlib ---
-        st.subheader("📈 Waveform Visualization")
-        fig, ax = plt.subplots(figsize=(10, 3))
-        time = np.linspace(0, len(output) / fs, num=len(output))
-        ax.plot(time, output, color="black", linewidth=0.5)
-        ax.set_facecolor("white")
-        fig.patch.set_facecolor("white")
-        ax.set_xlabel("Time [s]", fontsize=10, fontweight='bold', color='black')
-        ax.set_ylabel("Amplitude", fontsize=10, fontweight='bold', color='black')
-        ax.set_title("Processed Audio Waveform", fontsize=12, fontweight='bold', color='black')
-        ax.tick_params(colors='black')
-        st.pyplot(fig)
+    st.markdown("### 📈 Processed Audio Waveform")
+    fig, ax = plt.subplots(figsize=(10, 3))
+    time = np.linspace(0, len(output) / fs, num=len(output))
+    ax.plot(time, output, color="cyan", linewidth=0.5)
+    ax.set_facecolor("#0b1a2d")
+    fig.patch.set_facecolor("#0b1a2d")
+    ax.set_xlabel("Time [s]", color="white")
+    ax.set_ylabel("Amplitude", color="white")
+    ax.set_title("Processed Audio", color="white")
+    ax.tick_params(colors='white')
+    st.pyplot(fig)
