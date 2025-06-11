@@ -110,7 +110,7 @@ if uploaded_file is not None:
         st.download_button("⬇️ Download Processed Audio", buf.getvalue(), file_name="hotpink_equalized_output.wav")
 
         # --- Processed Visualization Only ---
-        st.subheader("🌈 Processed Track Waveform")
+        st.subheader("🔊 Processed Track Waveform")
         fig, ax = plt.subplots(figsize=(10, 4))
 
         time = np.linspace(0, len(output) / fs, num=len(output))
